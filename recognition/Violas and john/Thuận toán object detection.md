@@ -80,7 +80,6 @@
   - Duyệt hết haar feature này có trong tất cả các ảnh có mặt người hoặc không
   - Chọn ra ngưỡng Haar feature tốt nhất mà nó có thể phân chia giữa face và non-face 
   - Tính hàm error và lặp lại các bước trên 
-![ảnh minh họa 2](https://www.researchgate.net/profile/Mahdi-Rezaei-14/publication/258374050/figure/fig12/AS:668504957136915@1536395410760/Haar-feature-matching-inside-the-weak-classifiers.jpg)
 + AdaBoost sẽ:  
   - Kết hợp nhiều “weak classifiers” (phân loại yếu) thành “strong classifier”.  
   - Giúp giảm số đặc trưng cần dùng, tăng độ chính xác.  
@@ -94,24 +93,21 @@
     2. Với mỗi vòng lặp t:  
        - Huấn luyện một **weak classifier** \( h_t(x) \) trên dữ liệu có trọng số \( w_i \).  
        - Tính **lỗi phân loại có trọng số**:  
-         \[
-         \varepsilon_t = \frac{\sum_{i=1}^N w_i \cdot \mathbf{}(h_t(x_i) \neq y_i)}{\sum_{i=1}^N w_i}
-         \]
-       - Tính **hệ số α** (độ tin cậy của weak classifier):  
-         \[
-         \alpha_t = \frac{1}{2} \ln \left( \frac{1 - \varepsilon_t}{\varepsilon_t} \right)
-         \]
+       
+         ![equation](         https://latex.codecogs.com/svg.image?\varepsilon_t=\frac{\sum_{i=1}^N&space;w_i\cdot\mathbf{}(h_t(x_i)\neq&space;y_i)}{\sum_{i=1}^N&space;w_i}
+         )
+       - Tính **hệ số α** (độ tin cậy của weak classifier): 
+        
+         ![equation](https://latex.codecogs.com/svg.image?\alpha_t=\frac{1}{2}\ln\left(\frac{1-\varepsilon_t}{\varepsilon_t}\right))
        - Cập nhật trọng số mẫu:  
-         \[
-         w_i \leftarrow w_i \cdot e^{-\alpha_t y_i h_t(x_i)}
-         \]
-         (nếu phân loại sai thì trọng số tăng, phân loại đúng thì giảm).  
-       - Chuẩn hóa lại \( w_i \) để tổng = 1.  
+       
+         ![equation](https://latex.codecogs.com/svg.image?&space;w_i\leftarrow&space;w_i\cdot&space;e^{-\alpha_t&space;y_i&space;h_t(x_i)})
+         (nếu phân loại sai thì trọng số tăng, phân loại đúng thì giảm).
+      
+       - Chuẩn hóa lại w_i để tổng = 1.  
 
     3. Bộ phân loại mạnh cuối cùng:  
-       \[
-       H(x) = \text{sign} \left( \sum_{t=1}^T \alpha_t h_t(x) \right)
-       \]
+       ![equation](https://latex.codecogs.com/svg.image?&space;H(x)=\text{sign}\left(\sum_{t=1}^T\alpha_t&space;h_t(x)\right))
 
 ---
 
