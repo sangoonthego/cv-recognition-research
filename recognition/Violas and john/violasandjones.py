@@ -53,39 +53,41 @@ def haar4rec(x, y, inter_image, scale):
 
 
 class ViolaJones:
-    def __init__(self, haar_func, window_size, num_classifiers=50, scale=1):
+    def __init__(self, haar_func, window_size, num_classifiers=50, scale=[1]):
         self.scale = scale
         self.window_size = window_size
         self.num_classifiers = num_classifiers
         self.haar_func = haar_func
         self.weak_classifiers = []
+        self.Matrix_feature =[]
         self.features = None
 
     def generate_feature(self):
         feature = []
         H, W = self.window_size
-        for i in range(H):
-            for j in range(W):
-                for haar_func in self.haar_func:
-                    if haar_func == haar2rec_horizone:
-                        w, h = 2 * self.scale, 1 * self.scale
-                    elif haar_func == haar2rec_vertical:
-                        w, h = 1 * self.scale, 2 * self.scale
-                    elif haar_func == haar3rec:
-                        w, h = 3 * self.scale, 1 * self.scale
-                    elif haar_func == haar4rec:
-                        w, h = 2 * self.scale, 2 * self.scale
-                    else:
-                        continue
-                    w, h = int(w), int(h)
-                    if j + w > W or i + h > H:
-                        continue
-                    feature.append([j, i, w, h, haar_func])
+        for scale in self.scale: 
+            for i in range(H):
+                for j in range(W):
+                    for haar_func in self.haar_func:
+                        if haar_func == haar2rec_horizone:
+                            w, h = 2 * scale, 1 * scale
+                        elif haar_func == haar2rec_vertical:
+                            w, h = 1 * scale, 2 * scale
+                        elif haar_func == haar3rec:
+                            w, h = 3 * scale, 1 * scale
+                        elif haar_func == haar4rec:
+                            w, h = 2 * scale, 2 * scale
+                        else:
+                            continue
+                        w, h = int(w), int(h)
+                        if j + w > W or i + h > H:
+                            continue
+                        feature.append([j, i, w, h,scale, haar_func])
         self.features = feature
     def apply_feature(self, ii, feature):
-        x, y, w, h, haar_func = feature
-        return haar_func(x, y, ii, self.scale)
-
+        x, y, w, h,scale, haar_func = feature
+        val = haar_func(x, y, ii, scale)
+        return 0 if val is None else val
     @staticmethod
     def find_best(featureis, labels, w):
         sort_idx = np.argsort(featureis)
@@ -117,46 +119,49 @@ class ViolaJones:
         return best_error, best_pol, best_thresh
 
     @staticmethod
-    def week_pred(ii, clf):
+    def weak_pred(ii, clf):
         feature, pol, thresh = clf
-        x, y, w, h, haar_func = feature
-        f = haar_func(x, y, ii, 1)
+        x, y, w, h,scale, haar_func = feature
+        f = haar_func(x, y, ii, scale)
         if f is None:
             return 0
         if pol == 1:
-            return 1 if f < thresh else 0
-        else:
             return 1 if f > thresh else 0
+        else:
+            return 1 if f < thresh else 0
 
     def train(self, images,labels,images_vals,labels_vals): # bổ sung thêm val test
         integral_image = [cv2.integral(img) for img in images]
         n = len(images)
         w = np.ones(n) / n
-
+        # tạo ma trận feature lưu vào máy
+        self.Matrix_feature = np.zeros((len(images), len(self.features)), dtype=np.float32)
+        for f_idx, feature in enumerate(self.features):
+            for img_idx, ii in enumerate(integral_image):
+                self.Matrix_feature[img_idx, f_idx] = self.apply_feature(ii, feature)
         for t in range(self.num_classifiers):
             best_error = float('inf')
             best_clf = None
-
-            for feature in self.features:
-                featureis = np.array([self.apply_feature(ii, feature) for ii in integral_image])
-                error, pol, thresh = self.find_best(featureis, labels, w)
+            for idex_f,feature in enumerate(self.features):
+                error, pol, thresh = self.find_best(self.Matrix_feature[:,idex_f], labels, w)
                 if error < best_error:
                     best_error = error
                     best_clf = [feature, pol, thresh]
 
             alpha = 0.5 * np.log((1 - best_error) / max(best_error, 1e-10))
-            pred = np.array([self.week_pred(ii, best_clf) for ii in integral_image])
+            pred = np.array([self.weak_pred(ii, best_clf) for ii in integral_image])
             w = w * np.exp(-alpha * (2 * labels - 1) * (2 * pred - 1))
             w /= w.sum()
 
             self.weak_classifiers.append((best_clf, alpha))
+            # chạy tập val nếu có 
             if images_vals is not None and labels_vals is not None:
               pred=[]
               for image in images_vals: 
                 pred.append(self.predict(image))
               pred=np.array(pred)
               acc=(pred==labels_vals).mean()*100
-              print(f"num_classifiers {t+1}: error={best_error:.4f} val_accuracy={acc:.2f}")
+              print(f"num_classifiers {t+1}: error={best_error:.4f} val_accuracy={acc:.1f}%")
             else: 
               print(f"num_classifiers {t+1}: error={best_error:.4f}")
 
@@ -164,7 +169,7 @@ class ViolaJones:
         ii = cv2.integral(image)
         H, alpha_sum = 0, 0
         for clf, alpha in self.weak_classifiers:
-            pred = self.week_pred(ii, clf)
+            pred = self.weak_pred(ii, clf)
             H += alpha * pred
             alpha_sum += alpha
         return 1 if H >= 0.5 * alpha_sum else 0
