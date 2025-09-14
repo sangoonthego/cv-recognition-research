@@ -86,9 +86,7 @@
   - Công thức AdaBoost trong Viola–Jones   : 
 
     1. Ban đầu, gán trọng số cho mỗi mẫu huấn luyện:  
-       \[
-       w_i = \frac{1}{N}, \quad i = 1, 2, ..., N
-       \]
+         ![equation](https://latex.codecogs.com/svg.image?&space;w_i=\frac{1}{N},\quad&space;i=1,2,...,N&space;)
 
     2. Với mỗi vòng lặp t:  
        - Huấn luyện một **weak classifier** \( h_t(x) \) trên dữ liệu có trọng số \( w_i \).  
@@ -107,7 +105,7 @@
        - Chuẩn hóa lại w_i để tổng = 1.  
 
     3. Bộ phân loại mạnh cuối cùng:  
-       ![equation](https://latex.codecogs.com/svg.image?&space;H(x)=\text{sign}\left(\sum_{t=1}^T\alpha_t&space;h_t(x)\right))
+          ![equation](https://latex.codecogs.com/svg.image?&space;H(x)=\text{sign}\left(\sum_{t=1}^T\alpha_t&space;h_t(x)\right))
 
 ---
 
