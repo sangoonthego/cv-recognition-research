@@ -80,7 +80,7 @@
   - Duyệt hết haar feature này có trong tất cả các ảnh có mặt người hoặc không
   - Chọn ra ngưỡng Haar feature tốt nhất mà nó có thể phân chia giữa face và non-face 
   - Tính hàm error và lặp lại các bước trên 
-![Anh](https://www.researchgate.net/profile/Mahdi-Rezaei-14/publication/258374050/figure/fig12/AS:668504957136915@1536395410760/Haar-feature-matching-inside-the-weak-classifiers.jpg)
+![ảnh minh họa 2](https://www.researchgate.net/profile/Mahdi-Rezaei-14/publication/258374050/figure/fig12/AS:668504957136915@1536395410760/Haar-feature-matching-inside-the-weak-classifiers.jpg)
 + AdaBoost sẽ:  
   - Kết hợp nhiều “weak classifiers” (phân loại yếu) thành “strong classifier”.  
   - Giúp giảm số đặc trưng cần dùng, tăng độ chính xác.  
