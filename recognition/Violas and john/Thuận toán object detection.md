@@ -94,7 +94,7 @@
        - Huấn luyện một **weak classifier** \( h_t(x) \) trên dữ liệu có trọng số \( w_i \).  
        - Tính **lỗi phân loại có trọng số**:  
        
-         ![equation](         https://latex.codecogs.com/svg.image?\varepsilon_t=\frac{\sum_{i=1}^N&space;w_i\cdot\mathbf{}(h_t(x_i)\neq&space;y_i)}{\sum_{i=1}^N&space;w_i}
+         ![equation](https://latex.codecogs.com/svg.image?\varepsilon_t=\frac{\sum_{i=1}^N&space;w_i\cdot\mathbf{}(h_t(x_i)\neq&space;y_i)}{\sum_{i=1}^N&space;w_i}
          )
        - Tính **hệ số α** (độ tin cậy của weak classifier): 
         
