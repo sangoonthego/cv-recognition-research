@@ -136,8 +136,8 @@ class ViolaJones:
         w = np.ones(n) / n
         # tạo ma trận feature lưu vào máy
         self.Matrix_feature = np.zeros((len(images), len(self.features)), dtype=np.float32)
-        for f_idx, feature in enumerate(self.features):
-            for img_idx, ii in enumerate(integral_image):
+        for f_idx, feature in enumerate(self.features): # tinh chỉnh dùng numpy vào
+            for img_idx, ii in enumerate(integral_image):   
                 self.Matrix_feature[img_idx, f_idx] = self.apply_feature(ii, feature)
         for t in range(self.num_classifiers):
             best_error = float('inf')
@@ -164,7 +164,6 @@ class ViolaJones:
               print(f"num_classifiers {t+1}: error={best_error:.4f} val_accuracy={acc:.1f}%")
             else: 
               print(f"num_classifiers {t+1}: error={best_error:.4f}")
-
     def predict(self, image):
         ii = cv2.integral(image)
         H, alpha_sum = 0, 0
@@ -172,4 +171,6 @@ class ViolaJones:
             pred = self.weak_pred(ii, clf)
             H += alpha * pred
             alpha_sum += alpha
+            if H < 0.5 * alpha_sum: # loại ngay lập tức nếu không thỏa điều kiện 
+              return 0
         return 1 if H >= 0.5 * alpha_sum else 0
